@@ -44,4 +44,16 @@ public class ReadingEntryService
         entry.Rating = rating;
         await _repository.UpdateAsync(entry);
     }
+
+    public async Task UpdateProgressAsync(int entryId, int pagesRead)
+    {
+        var entry = await _repository.GetByIdAsync(entryId);
+        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+
+        if (pagesRead > entry.Book.TotalPages)
+            throw new PagesExceedTotalException();
+
+        entry.PagesRead = pagesRead;
+        await _repository.UpdateAsync(entry);
+    }
 }
