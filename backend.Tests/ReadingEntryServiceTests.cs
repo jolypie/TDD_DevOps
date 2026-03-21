@@ -45,4 +45,23 @@ public class ReadingEntryServiceTests
         // Assert
         await act.Should().ThrowAsync<InvalidStatusTransitionException>();
     }
+
+    [Fact]
+    public async Task SetRating_WhenStatusIsNotFinished_ThrowsRatingNotAllowedException()
+    {
+        // Arrange
+        var entry = new ReadingEntry { Id = 1, UserId = 1, BookId = 1, Status = ReadingStatus.Reading };
+        var repositoryMock = new Mock<IReadingEntryRepository>();
+        repositoryMock
+            .Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(entry);
+
+        var service = new ReadingEntryService(repositoryMock.Object);
+
+        // Act
+        var act = async () => await service.SetRatingAsync(entryId: 1, rating: 5);
+
+        // Assert
+        await act.Should().ThrowAsync<RatingNotAllowedException>();
+    }
 }
