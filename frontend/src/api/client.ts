@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5189';
 
 export const api = {
   get: (path: string) =>
@@ -17,4 +17,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
+
+  delete: (path: string) =>
+    fetch(`${BASE_URL}${path}`, { method: 'DELETE' }),
 };

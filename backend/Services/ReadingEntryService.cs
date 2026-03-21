@@ -25,10 +25,14 @@ public class ReadingEntryService
     {
         var entry = await GetEntryOrThrowAsync(entryId);
 
-        if (newStatus <= entry.Status)
+        if (entry.Status == ReadingStatus.WantToRead && newStatus == ReadingStatus.Finished)
             throw new InvalidStatusTransitionException(entry.Status, newStatus);
 
         entry.Status = newStatus;
+
+        if (newStatus == ReadingStatus.Finished)
+            entry.PagesRead = entry.Book.TotalPages;
+
         await _repository.UpdateAsync(entry);
     }
 

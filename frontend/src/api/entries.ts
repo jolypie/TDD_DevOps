@@ -28,3 +28,6 @@ export const setRating = (entryId: number, rating: number) =>
 
 export const updateProgress = (entryId: number, pagesRead: number) =>
   api.patch(`/api/readingentries/${entryId}/progress`, { pagesRead });
+
+export const deleteEntry = (entryId: number) =>
+  api.delete(`/api/readingentries/${entryId}`);
