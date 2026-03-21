@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACKEND: ghcr.io/${{ github.repository_owner }}/booklibrary-backend
+  IMAGE_FRONTEND: ghcr.io/${{ github.repository_owner }}/booklibrary-frontend
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore backend.Tests/BookLibraryApp.Tests.csproj
+
+      - name: Build
+        run: dotnet build backend/BookLibraryApp.csproj --no-restore
+
+      - name: Run tests with coverage
+        run: |
+          dotnet test backend.Tests/BookLibraryApp.Tests.csproj \
+            --no-restore \
+            --logger "trx;LogFileName=test-results.trx" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover \
+            /p:CoverletOutput=./coverage.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: backend.Tests/test-results.trx
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend.Tests/coverage.xml
+
+  lint:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build with warnings as analysis
+        run: dotnet build backend/BookLibraryApp.csproj -warnaserror:nullable
+
+      - name: Frontend lint
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+  docker:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.IMAGE_BACKEND }}:latest,${{ env.IMAGE_BACKEND }}:${{ github.sha }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.IMAGE_FRONTEND }}:latest,${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
