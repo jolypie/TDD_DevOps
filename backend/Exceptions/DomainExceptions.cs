@@ -32,6 +32,12 @@ public class FutureDateNotAllowedException : Exception
         : base($"{fieldName} cannot be a future date.") { }
 }
 
+public class FutureDateException : Exception
+{
+    public FutureDateException()
+        : base("Start date cannot be in the future.") { }
+}
+
 public class StartDateRequiredException : Exception
 {
     public StartDateRequiredException()

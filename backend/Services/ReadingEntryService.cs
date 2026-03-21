@@ -56,4 +56,16 @@ public class ReadingEntryService
         entry.PagesRead = pagesRead;
         await _repository.UpdateAsync(entry);
     }
+
+    public async Task SetStartDateAsync(int entryId, DateTime startDate)
+    {
+        if (startDate > DateTime.UtcNow)
+            throw new FutureDateException();
+
+        var entry = await _repository.GetByIdAsync(entryId);
+        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+
+        entry.StartDate = startDate;
+        await _repository.UpdateAsync(entry);
+    }
 }
