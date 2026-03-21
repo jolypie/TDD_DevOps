@@ -32,4 +32,16 @@ public class ReadingEntryService
         entry.Status = newStatus;
         await _repository.UpdateAsync(entry);
     }
+
+    public async Task SetRatingAsync(int entryId, int rating)
+    {
+        var entry = await _repository.GetByIdAsync(entryId);
+        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+
+        if (entry.Status != ReadingStatus.Finished)
+            throw new RatingNotAllowedException();
+
+        entry.Rating = rating;
+        await _repository.UpdateAsync(entry);
+    }
 }
