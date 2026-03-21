@@ -23,8 +23,7 @@ public class ReadingEntryService
 
     public async Task ChangeStatusAsync(int entryId, ReadingStatus newStatus)
     {
-        var entry = await _repository.GetByIdAsync(entryId);
-        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+        var entry = await GetEntryOrThrowAsync(entryId);
 
         if (newStatus <= entry.Status)
             throw new InvalidStatusTransitionException(entry.Status, newStatus);
@@ -35,8 +34,7 @@ public class ReadingEntryService
 
     public async Task SetRatingAsync(int entryId, int rating)
     {
-        var entry = await _repository.GetByIdAsync(entryId);
-        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+        var entry = await GetEntryOrThrowAsync(entryId);
 
         if (entry.Status != ReadingStatus.Finished)
             throw new RatingNotAllowedException();
@@ -47,8 +45,7 @@ public class ReadingEntryService
 
     public async Task UpdateProgressAsync(int entryId, int pagesRead)
     {
-        var entry = await _repository.GetByIdAsync(entryId);
-        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
+        var entry = await GetEntryOrThrowAsync(entryId);
 
         if (pagesRead > entry.Book.TotalPages)
             throw new PagesExceedTotalException();
@@ -62,10 +59,15 @@ public class ReadingEntryService
         if (startDate > DateTime.UtcNow)
             throw new FutureDateException();
 
-        var entry = await _repository.GetByIdAsync(entryId);
-        if (entry == null) throw new KeyNotFoundException("Reading entry not found.");
-
+        var entry = await GetEntryOrThrowAsync(entryId);
         entry.StartDate = startDate;
         await _repository.UpdateAsync(entry);
+    }
+
+    private async Task<ReadingEntry> GetEntryOrThrowAsync(int entryId)
+    {
+        var entry = await _repository.GetByIdAsync(entryId);
+        if (entry == null) throw new KeyNotFoundException($"Reading entry {entryId} not found.");
+        return entry;
     }
 }
