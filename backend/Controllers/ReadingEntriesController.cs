@@ -1,13 +1,15 @@
+using BookLibraryApp.Data;
 using BookLibraryApp.Exceptions;
 using BookLibraryApp.Models;
 using BookLibraryApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookLibraryApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ReadingEntriesController(ReadingEntryService service) : ControllerBase
+public class ReadingEntriesController(ReadingEntryService service, AppDbContext db) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> AddEntry([FromBody] AddEntryRequest request)
@@ -93,6 +95,16 @@ public class ReadingEntriesController(ReadingEntryService service) : ControllerB
         {
             return NotFound(ex.Message);
         }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteEntry(int id)
+    {
+        var entry = await db.ReadingEntries.FindAsync(id);
+        if (entry == null) return NotFound();
+        db.ReadingEntries.Remove(entry);
+        await db.SaveChangesAsync();
+        return NoContent();
     }
 }
 

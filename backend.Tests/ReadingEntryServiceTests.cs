@@ -28,10 +28,11 @@ public class ReadingEntryServiceTests
     }
 
     [Fact]
-    public async Task ChangeStatus_WhenMovingBackward_ThrowsInvalidStatusTransitionException()
+    public async Task ChangeStatus_WhenSkippingReadingStatus_ThrowsInvalidStatusTransitionException()
     {
         // Arrange
-        var entry = new ReadingEntry { Id = 1, UserId = 1, BookId = 1, Status = ReadingStatus.Finished };
+        var book = new Book { Id = 1, TotalPages = 300 };
+        var entry = new ReadingEntry { Id = 1, UserId = 1, BookId = 1, Status = ReadingStatus.WantToRead, Book = book };
         var repositoryMock = new Mock<IReadingEntryRepository>();
         repositoryMock
             .Setup(r => r.GetByIdAsync(1))
@@ -39,8 +40,8 @@ public class ReadingEntryServiceTests
 
         var service = new ReadingEntryService(repositoryMock.Object);
 
-        // Act
-        var act = async () => await service.ChangeStatusAsync(entryId: 1, newStatus: ReadingStatus.Reading);
+        // Act: trying to go WantToRead → Finished (must go through Reading first)
+        var act = async () => await service.ChangeStatusAsync(entryId: 1, newStatus: ReadingStatus.Finished);
 
         // Assert
         await act.Should().ThrowAsync<InvalidStatusTransitionException>();

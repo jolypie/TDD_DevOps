@@ -10,7 +10,6 @@ export default function BooksPage() {
   const [error, setError] = useState('');
 
   const load = () => getBooks().then(setBooks);
-
   useEffect(() => { load(); }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -21,36 +20,68 @@ export default function BooksPage() {
       setTitle(''); setAuthor(''); setTotalPages('');
       load();
     } else {
-      setError('Failed to add book. Check your input.');
+      setError('Check your input — all fields are required.');
     }
   };
 
   return (
     <div className="page">
-      <h1>Books</h1>
+      <div className="page-header">
+        <h1>Books</h1>
+        <p>Add books to the library, then track them in My List.</p>
+      </div>
 
-      <form onSubmit={handleAdd} className="form">
-        <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <input placeholder="Author" value={author} onChange={(e) => setAuthor(e.target.value)} required />
-        <input placeholder="Total pages" type="number" value={totalPages} onChange={(e) => setTotalPages(e.target.value)} required />
-        <button type="submit">Add Book</button>
-        {error && <p className="error">{error}</p>}
+      <form onSubmit={handleAdd} className="add-form">
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <input
+          placeholder="Author"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          required
+        />
+        <input
+          placeholder="Pages"
+          type="number"
+          min={1}
+          value={totalPages}
+          onChange={(e) => setTotalPages(e.target.value)}
+          required
+          style={{ maxWidth: 100 }}
+        />
+        <button type="submit" className="btn btn-primary">Add Book</button>
       </form>
+      {error && <p className="error-msg">{error}</p>}
 
-      <table>
-        <thead>
-          <tr><th>Title</th><th>Author</th><th>Pages</th></tr>
-        </thead>
-        <tbody>
-          {books.map((b) => (
-            <tr key={b.id}>
-              <td>{b.title}</td>
-              <td>{b.author}</td>
-              <td>{b.totalPages}</td>
+      {books.length === 0 ? (
+        <div className="empty">
+          <div className="empty-icon">📚</div>
+          <p>No books yet. Add the first one above.</p>
+        </div>
+      ) : (
+        <table className="books-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Pages</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {books.map((b) => (
+              <tr key={b.id}>
+                <td style={{ fontWeight: 500 }}>{b.title}</td>
+                <td style={{ color: 'var(--text-muted)' }}>{b.author}</td>
+                <td style={{ color: 'var(--text-muted)' }}>{b.totalPages}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
