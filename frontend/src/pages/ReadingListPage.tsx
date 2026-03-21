@@ -19,12 +19,6 @@ const STATUS_LABELS: Record<ReadingStatus, string> = {
   Finished: 'Finished',
 };
 
-const STATUS_CLASS: Record<ReadingStatus, string> = {
-  WantToRead: 'badge badge-want',
-  Reading: 'badge badge-reading',
-  Finished: 'badge badge-finished',
-};
-
 const STATUS_DOT: Record<ReadingStatus, string> = {
   WantToRead: '○',
   Reading: '◉',
