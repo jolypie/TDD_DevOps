@@ -64,4 +64,24 @@ public class ReadingEntryServiceTests
         // Assert
         await act.Should().ThrowAsync<RatingNotAllowedException>();
     }
+
+    [Fact]
+    public async Task UpdateProgress_WhenPagesReadExceedTotalPages_ThrowsPagesExceedTotalException()
+    {
+        // Arrange
+        var book = new Book { Id = 1, TotalPages = 100 };
+        var entry = new ReadingEntry { Id = 1, UserId = 1, BookId = 1, Status = ReadingStatus.Reading, Book = book };
+        var repositoryMock = new Mock<IReadingEntryRepository>();
+        repositoryMock
+            .Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(entry);
+
+        var service = new ReadingEntryService(repositoryMock.Object);
+
+        // Act
+        var act = async () => await service.UpdateProgressAsync(entryId: 1, pagesRead: 150);
+
+        // Assert
+        await act.Should().ThrowAsync<PagesExceedTotalException>();
+    }
 }
