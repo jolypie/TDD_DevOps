@@ -35,6 +35,7 @@ jobs:
           dotnet test backend.Tests/BookLibraryApp.Tests.csproj \
             --no-restore \
             --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./TestResults \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=./coverage.xml
@@ -44,7 +45,7 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: backend.Tests/test-results.trx
+          path: TestResults/test-results.trx
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
