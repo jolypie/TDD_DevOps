@@ -1,6 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookLibraryApp", "backend\BookLibraryApp.csproj", "{F17C236E-27B7-4B5A-A246-E92BB6401AC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookLibraryApp.Tests", "backend.Tests\BookLibraryApp.Tests.csproj", "{F9B9EBF1-2479-4055-9EFC-8375EF94D00D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +15,9 @@ Global
 		{F17C236E-27B7-4B5A-A246-E92BB6401AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F17C236E-27B7-4B5A-A246-E92BB6401AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F17C236E-27B7-4B5A-A246-E92BB6401AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9B9EBF1-2479-4055-9EFC-8375EF94D00D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9B9EBF1-2479-4055-9EFC-8375EF94D00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9B9EBF1-2479-4055-9EFC-8375EF94D00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9B9EBF1-2479-4055-9EFC-8375EF94D00D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
