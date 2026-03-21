@@ -84,4 +84,24 @@ public class ReadingEntryServiceTests
         // Assert
         await act.Should().ThrowAsync<PagesExceedTotalException>();
     }
+
+    [Fact]
+    public async Task SetStartDate_WhenDateIsInTheFuture_ThrowsFutureDateException()
+    {
+        // Arrange
+        var entry = new ReadingEntry { Id = 1, UserId = 1, BookId = 1, Status = ReadingStatus.WantToRead };
+        var repositoryMock = new Mock<IReadingEntryRepository>();
+        repositoryMock
+            .Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(entry);
+
+        var service = new ReadingEntryService(repositoryMock.Object);
+        var futureDate = DateTime.UtcNow.AddDays(1);
+
+        // Act
+        var act = async () => await service.SetStartDateAsync(entryId: 1, startDate: futureDate);
+
+        // Assert
+        await act.Should().ThrowAsync<FutureDateException>();
+    }
 }
