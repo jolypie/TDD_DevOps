@@ -40,7 +40,7 @@ jobs:
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=./coverage.xml \
             /p:ExcludeByFile="**/Program.cs" \
-            "/p:Exclude=[*]BookLibraryApp.Data.*,[*]BookLibraryApp.Controllers.*"
+            /p:Exclude="[*]BookLibraryApp.Data.*%2c[*]BookLibraryApp.Controllers.*"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
