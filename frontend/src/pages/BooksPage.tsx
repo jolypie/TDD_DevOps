@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Book } from '../api/books';
-import { createBook, getBooks } from '../api/books';
+import { createBook, deleteBook, getBooks } from '../api/books';
 
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -19,9 +19,17 @@ export default function BooksPage() {
     if (res.ok) {
       setTitle(''); setAuthor(''); setTotalPages('');
       load();
+    } else if (res.status === 409) {
+      setError('This book already exists in the library.');
     } else {
       setError('Check your input — all fields are required.');
     }
+  };
+
+  const handleDelete = async (book: Book) => {
+    if (!confirm(`Delete "${book.title}"? This will also remove it from all reading lists.`)) return;
+    await deleteBook(book.id);
+    load();
   };
 
   return (
@@ -69,6 +77,7 @@ export default function BooksPage() {
               <th>Title</th>
               <th>Author</th>
               <th>Pages</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -77,6 +86,12 @@ export default function BooksPage() {
                 <td style={{ fontWeight: 500 }}>{b.title}</td>
                 <td style={{ color: 'var(--text-muted)' }}>{b.author}</td>
                 <td style={{ color: 'var(--text-muted)' }}>{b.totalPages}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleDelete(b)}
+                  >✕</button>
+                </td>
               </tr>
             ))}
           </tbody>
