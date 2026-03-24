@@ -97,6 +97,28 @@ public class ReadingEntriesController(ReadingEntryService service, AppDbContext 
         }
     }
 
+    [HttpPatch("{id}/finish-date")]
+    public async Task<IActionResult> SetFinishDate(int id, [FromBody] SetFinishDateRequest request)
+    {
+        try
+        {
+            await service.SetFinishDateAsync(id, request.FinishDate);
+            return NoContent();
+        }
+        catch (FutureDateNotAllowedException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (FinishDateBeforeStartDateException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEntry(int id)
     {
@@ -113,3 +135,4 @@ public record ChangeStatusRequest(ReadingStatus Status);
 public record SetRatingRequest(int Rating);
 public record UpdateProgressRequest(int PagesRead);
 public record SetStartDateRequest(DateTime StartDate);
+public record SetFinishDateRequest(DateTime FinishDate);

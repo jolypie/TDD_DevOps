@@ -11,3 +11,6 @@ export const getBooks = (): Promise<Book[]> => api.get('/api/books');
 
 export const createBook = (book: Omit<Book, 'id'>) =>
   api.post('/api/books', book);
+
+export const deleteBook = (id: number) =>
+  api.delete(`/api/books/${id}`);

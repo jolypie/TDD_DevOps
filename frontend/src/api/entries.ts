@@ -11,6 +11,7 @@ export interface ReadingEntry {
   pagesRead: number;
   rating?: number;
   startDate?: string;
+  finishDate?: string;
   book: Book;
 }
 
@@ -28,6 +29,12 @@ export const setRating = (entryId: number, rating: number) =>
 
 export const updateProgress = (entryId: number, pagesRead: number) =>
   api.patch(`/api/readingentries/${entryId}/progress`, { pagesRead });
+
+export const setStartDate = (entryId: number, startDate: string) =>
+  api.patch(`/api/readingentries/${entryId}/start-date`, { startDate });
+
+export const setFinishDate = (entryId: number, finishDate: string) =>
+  api.patch(`/api/readingentries/${entryId}/finish-date`, { finishDate });
 
 export const deleteEntry = (entryId: number) =>
   api.delete(`/api/readingentries/${entryId}`);

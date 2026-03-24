@@ -38,7 +38,9 @@ jobs:
             --results-directory ./TestResults \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
-            /p:CoverletOutput=./coverage.xml
+            /p:CoverletOutput=./coverage.xml \
+            /p:ExcludeByFile="**/Program.cs" \
+            "/p:Exclude=[*]BookLibraryApp.Data.*,[*]BookLibraryApp.Controllers.*"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

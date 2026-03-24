@@ -20,6 +20,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IReadingEntryRepository, EfReadingEntryRepository>();
 builder.Services.AddScoped<ReadingEntryService>();
+builder.Services.AddScoped<IBookRepository, EfBookRepository>();
+builder.Services.AddScoped<BookService>();
 
 builder.Services.AddCors(options =>
 {

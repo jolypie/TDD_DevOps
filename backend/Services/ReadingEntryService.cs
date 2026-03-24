@@ -28,6 +28,9 @@ public class ReadingEntryService
         if (entry.Status == ReadingStatus.WantToRead && newStatus == ReadingStatus.Finished)
             throw new InvalidStatusTransitionException(entry.Status, newStatus);
 
+        if (newStatus == ReadingStatus.Finished && entry.StartDate == null)
+            throw new StartDateRequiredException();
+
         entry.Status = newStatus;
 
         if (newStatus == ReadingStatus.Finished)
@@ -64,7 +67,25 @@ public class ReadingEntryService
             throw new FutureDateException();
 
         var entry = await GetEntryOrThrowAsync(entryId);
+
+        if (entry.FinishDate.HasValue && startDate > entry.FinishDate.Value)
+            throw new FinishDateBeforeStartDateException();
+
         entry.StartDate = startDate;
+        await _repository.UpdateAsync(entry);
+    }
+
+    public async Task SetFinishDateAsync(int entryId, DateTime finishDate)
+    {
+        if (finishDate > DateTime.UtcNow)
+            throw new FutureDateNotAllowedException("Finish date");
+
+        var entry = await GetEntryOrThrowAsync(entryId);
+
+        if (entry.StartDate.HasValue && finishDate < entry.StartDate.Value)
+            throw new FinishDateBeforeStartDateException();
+
+        entry.FinishDate = finishDate;
         await _repository.UpdateAsync(entry);
     }
 

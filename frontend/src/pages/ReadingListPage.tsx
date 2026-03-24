@@ -7,7 +7,9 @@ import {
   changeStatus,
   deleteEntry,
   getUserEntries,
+  setFinishDate,
   setRating,
+  setStartDate,
   updateProgress,
 } from '../api/entries';
 
@@ -26,6 +28,9 @@ const STATUS_DOT: Record<ReadingStatus, string> = {
 };
 
 const ALL_STATUSES: ReadingStatus[] = ['WantToRead', 'Reading', 'Finished'];
+
+const toInputDate = (iso?: string) => iso ? iso.split('T')[0] : '';
+const today = () => new Date().toISOString().split('T')[0];
 
 export default function ReadingListPage() {
   const [entries, setEntries] = useState<ReadingEntry[]>([]);
@@ -51,6 +56,10 @@ export default function ReadingListPage() {
 
   const handleStatusChange = async (entry: ReadingEntry, newStatus: ReadingStatus) => {
     if (newStatus === entry.status) return;
+    if (newStatus === 'Finished' && !entry.startDate) {
+      alert('Set a start date first before marking as Finished! 📅');
+      return;
+    }
     const res = await changeStatus(entry.id, newStatus);
     if (!res.ok) {
       alert('Cannot skip from "Want to Read" directly to "Finished" — read it first! 📖');
@@ -68,6 +77,20 @@ export default function ReadingListPage() {
     const val = Number(progressValues[entry.id] ?? entry.pagesRead);
     const res = await updateProgress(entry.id, val);
     if (!res.ok) alert('Pages cannot exceed total pages of the book.');
+    else load();
+  };
+
+  const handleStartDate = async (entry: ReadingEntry, date: string) => {
+    if (!date) return;
+    const res = await setStartDate(entry.id, new Date(date).toISOString());
+    if (!res.ok) alert('Start date cannot be in the future.');
+    else load();
+  };
+
+  const handleFinishDate = async (entry: ReadingEntry, date: string) => {
+    if (!date) return;
+    const res = await setFinishDate(entry.id, new Date(date).toISOString());
+    if (!res.ok) alert('Finish date cannot be in the future.');
     else load();
   };
 
@@ -169,6 +192,46 @@ export default function ReadingListPage() {
                         <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
                       </div>
                     )}
+                  </div>
+                )}
+
+                {entry.status === 'Reading' && (
+                  <div className="date-row">
+                    <label className="date-label">
+                      📅 Started reading
+                      <input
+                        type="date"
+                        className="date-input"
+                        max={today()}
+                        value={toInputDate(entry.startDate)}
+                        onChange={(e) => handleStartDate(entry, e.target.value)}
+                      />
+                    </label>
+                  </div>
+                )}
+
+                {entry.status === 'Finished' && (
+                  <div className="date-row">
+                    <label className="date-label">
+                      📅 Started
+                      <input
+                        type="date"
+                        className="date-input"
+                        max={today()}
+                        value={toInputDate(entry.startDate)}
+                        onChange={(e) => handleStartDate(entry, e.target.value)}
+                      />
+                    </label>
+                    <label className="date-label">
+                      🏁 Finished
+                      <input
+                        type="date"
+                        className="date-input"
+                        max={today()}
+                        value={toInputDate(entry.finishDate)}
+                        onChange={(e) => handleFinishDate(entry, e.target.value)}
+                      />
+                    </label>
                   </div>
                 )}
 
