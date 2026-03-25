@@ -24,8 +24,6 @@ spec:
                 configMapKeyRef:
                   name: booklibrary-config
                   key: ASPNETCORE_ENVIRONMENT
-            - name: ConnectionStrings__DefaultConnection
-              value: "Host=$(DB_HOST);Port=$(DB_PORT);Database=$(DB_NAME);Username=$(DB_USER);Password=$(DB_PASSWORD)"
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
@@ -51,6 +49,8 @@ spec:
                 secretKeyRef:
                   name: booklibrary-secret
                   key: DB_PASSWORD
+            - name: ConnectionStrings__DefaultConnection
+              value: "Host=$(DB_HOST);Port=$(DB_PORT);Database=$(DB_NAME);Username=$(DB_USER);Password=$(DB_PASSWORD)"
           resources:
             requests:
               cpu: "100m"
