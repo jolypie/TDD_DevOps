@@ -16,6 +16,7 @@ spec:
       containers:
         - name: frontend
           image: ghcr.io/jolypie/booklibrary-frontend:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           resources:

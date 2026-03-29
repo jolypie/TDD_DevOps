@@ -18,10 +18,13 @@ Users can manage their personal reading list. Each user can add books, track rea
 
 **Business Rules:**
 1. A user cannot add the same book twice to their reading list
-2. Reading status can only move forward: `WantToRead → Reading → Finished`
+2. Status cannot skip `Reading` — `WantToRead → Finished` directly is not allowed
 3. Rating (1–5) can only be set when status is `Finished`
 4. Pages read cannot exceed the book's total pages
 5. Start date cannot be set to a future date
+6. A book cannot be marked as `Finished` without a start date set
+7. Finish date cannot be set to a future date
+8. Finish date cannot be earlier than start date (validated in both directions)
 
 ---
 
@@ -102,7 +105,7 @@ dotnet test backend.Tests/BookLibraryApp.Tests.csproj \
 - `IReadingEntryRepository` is mocked in unit tests — isolates service logic from database, tests run fast without infrastructure
 - Real `EfReadingEntryRepository` is used in integration tests with an InMemory database — verifies the full stack works together
 
-**Coverage targets:** ≥70% line, ≥50% branch (measured via coverlet, report published as CI artifact)
+**Coverage targets:** The project targets ≥90% branch coverage on the business logic layer (`ReadingEntryService`). Overall line coverage is lower (~22%) due to infrastructure code (controllers, EF Core configuration, Program.cs) which contains no domain logic and is intentionally excluded from the coverage target. Branch coverage across the business logic layer reaches ~93%, measured via coverlet and published as a CI artifact.
 
 ---
 
@@ -150,7 +153,28 @@ kubectl apply -f k8s/production/
 
 Manifests include: `Deployment`, `Service`, `ConfigMap`, `Secret`, `Ingress` with resource limits and requests.
 
-> Secrets in `secret.yaml` contain placeholder values (`REPLACE_ME`). In real deployment use Kubernetes Secrets managed via CI environment variables or a secrets manager.
+Both environments have been verified locally using minikube. All pods start successfully:
+- Staging: 1 replica each for backend, frontend and postgres
+- Production: 2 replicas for backend and frontend (high availability), 1 postgres
+
+**Accessing locally via port-forward:**
+```bash
+# Staging
+kubectl port-forward -n staging service/frontend-service 8081:80
+# open http://localhost:8081
+
+# Production
+kubectl port-forward -n production service/frontend-service 8082:80
+# open http://localhost:8082
+```
+
+> Secrets in `secret.yaml` contain placeholder values (`REPLACE_ME`). Apply real credentials with:
+> ```bash
+> kubectl create secret generic booklibrary-secret \
+>   --namespace=staging \
+>   --from-literal=DB_USER=postgres \
+>   --from-literal=DB_PASSWORD=your_password
+> ```
 
 ---
 

@@ -16,6 +16,7 @@ spec:
       containers:
         - name: backend
           image: ghcr.io/jolypie/booklibrary-backend:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           env:

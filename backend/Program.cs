@@ -54,4 +54,5 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("healthy"));
 app.Run();
